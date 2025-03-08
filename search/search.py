@@ -87,16 +87,97 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    from util import Stack
+
+    # Initialize the stack with the starting state and an empty list of actions
+    fringe = Stack()
+    start_state = problem.getStartState()
+    fringe.push((start_state, []))  # (state, actions)
+
+    # Initialize the explored set to keep track of visited states
+    explored = set()
+
+    while not fringe.isEmpty():
+        # Pop the current state and actions from the fringe
+        current_state, actions = fringe.pop()
+
+        # If the current state is the goal, return the list of actions
+        if problem.isGoalState(current_state):
+            return actions
+
+        # If the state has not been explored, add it to the explored set
+        if current_state not in explored:
+            explored.add(current_state)
+            for successor, action, _ in problem.getSuccessors(current_state):
+                fringe.push((successor, actions + [action]))
+
+    return []
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    from util import Queue
+
+    # Initialize the queue with the starting state and an empty list of actions
+    fringe = Queue()
+    start_state = problem.getStartState()
+    fringe.push((start_state, []))
+
+    # Initialize the explored set to keep track of visited states
+    explored = set()
+
+    while not fringe.isEmpty():
+        # Dequeue the current state and actions from the fringe
+        current_state, actions = fringe.pop()
+
+        # If the current state is the goal, return the list of actions
+        if problem.isGoalState(current_state):
+            return actions
+
+        # If the state has not been explored, add it to the explored set
+        if current_state not in explored:
+            explored.add(current_state)
+
+            # Expand the current state by getting its successors
+            for successor, action, _ in problem.getSuccessors(current_state):
+                fringe.push((successor, actions + [action]))
+
+    return []
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    from util import PriorityQueue
+
+    # Initialize the queue with the starting state and an empty list of actions
+    fringe = util.PriorityQueue()
+    start_state = problem.getStartState()
+    fringe.push((start_state, [], 0), 0)  # (state, actions, cost)
+
+    # Initialize the explored set to keep track of visited states
+    explored = set()
+
+    while not fringe.isEmpty():
+        # Dequeue the current state and actions from the fringe
+        current_state, actions, cost = fringe.pop() 
+
+
+        # If the current state is the goal, return the list of actions
+        if problem.isGoalState(current_state):
+            return actions
+
+        # If the state has not been explored, add it to the explored set
+        if current_state not in explored:
+            explored.add(current_state)
+
+            # Expand the current state by getting its successors
+            for successor, action, step_cost in problem.getSuccessors(current_state):
+                new_cost = cost + step_cost
+                fringe.push((successor, actions + [action], new_cost), new_cost)
+
+    return []
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -109,6 +190,34 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    from util import PriorityQueue
+
+    # Initialize the queue with the starting state and an empty list of actions
+    fringe = util.PriorityQueue()
+    start_state = problem.getStartState()
+    fringe.push((start_state, [], 0), heuristic(start_state, problem))  # (state, actions, cost)
+    
+    # Initialize the explored set to keep track of visited states   
+    explored = set()
+    
+    while not fringe.isEmpty():
+        # Dequeue the current state and actions from the fringe
+        current_state, actions, cost = fringe.pop() 
+        
+        # If the current state is the goal, return the list of actions
+        if problem.isGoalState(current_state):
+            return actions
+        
+        # If the state has not been explored, add it to the explored set
+        if current_state not in explored:
+            explored.add(current_state)
+            
+            # Expand the current state by getting its successors
+            for successor, action, step_cost in problem.getSuccessors(current_state):
+                new_cost = cost + step_cost
+                fringe.push((successor, actions + [action], new_cost), new_cost + heuristic(successor, problem))
+                
+    return []
     util.raiseNotDefined()
 
 
